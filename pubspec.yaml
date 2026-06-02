@@ -1,6 +1,6 @@
 name: mobius_carousel
 description: A custom infinite carousel slider with tilted neighbors, rubber-band pull-to-claim, confetti burst, claim dialog, and configurable ripple effects.
-version: 0.1.0
+version: 0.2.0
 homepage: https://github.com/Manish1Pandey/mobius_carousel
 repository: https://github.com/Manish1Pandey/mobius_carousel
 issue_tracker: https://github.com/Manish1Pandey/mobius_carousel/issues
