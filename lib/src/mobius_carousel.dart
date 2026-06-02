@@ -96,6 +96,22 @@ class MobiusCarousel extends StatefulWidget {
   /// center card downward.
   final MobiusRippleStyle rippleStyle;
 
+  /// Optional builder that replaces the built-in ticket card visual with
+  /// any widget you supply. Receives the [BuildContext], the [MobiusItem]
+  /// for that slot, and whether the card is currently focused (centered).
+  /// Returned widget is automatically sized to `cardWidth × cardHeight`,
+  /// wrapped in the tap handler, and laid into the tilted stack — all
+  /// other carousel interactions (drag, claim, confetti, dialog) continue
+  /// to work unchanged.
+  ///
+  /// When `null` (default), the built-in scallop-edged ticket card is
+  /// used and reads from the [MobiusItem] fields.
+  final Widget Function(
+    BuildContext context,
+    MobiusItem item,
+    bool isFocused,
+  )? cardBuilder;
+
   /// Creates a [MobiusCarousel].
   const MobiusCarousel({
     super.key,
@@ -119,6 +135,7 @@ class MobiusCarousel extends StatefulWidget {
     this.onClaimConfirmed,
     this.autoPlayInterval = const Duration(seconds: 4),
     this.rippleStyle = MobiusRippleStyle.wavy,
+    this.cardBuilder,
   });
 
   @override
@@ -393,6 +410,7 @@ class _MobiusCarouselState extends State<MobiusCarousel>
                               rightCardOffset: widget.rightCardOffset,
                               onJumpTo: _jumpTo,
                               onCenterCardTap: widget.onCenterCardTap,
+                              cardBuilder: widget.cardBuilder,
                             ),
                           ),
                         ),
@@ -465,6 +483,11 @@ class _MobiusStack extends StatelessWidget {
   final Offset rightCardOffset;
   final ValueChanged<int> onJumpTo;
   final void Function(MobiusItem item)? onCenterCardTap;
+  final Widget Function(
+    BuildContext context,
+    MobiusItem item,
+    bool isFocused,
+  )? cardBuilder;
 
   const _MobiusStack({
     required this.items,
@@ -479,6 +502,7 @@ class _MobiusStack extends StatelessWidget {
     required this.rightCardOffset,
     required this.onJumpTo,
     required this.onCenterCardTap,
+    required this.cardBuilder,
   });
 
   @override
@@ -505,6 +529,42 @@ class _MobiusStack extends StatelessWidget {
           distance <= 1.0 ? 1.0 : (1.0 - (distance - 1.0) * 3).clamp(0.0, 1.0);
 
       final itemIndex = ((i % count) + count) % count;
+      final item = items[itemIndex];
+      final entryIndex = i;
+
+      void handleTap() {
+        if (distance < 0.5 && onCenterCardTap != null) {
+          onCenterCardTap!(item);
+        } else {
+          onJumpTo(entryIndex);
+        }
+      }
+
+      final Widget card;
+      if (item.child != null) {
+        card = SizedBox(
+          width: cardWidth,
+          height: cardHeight,
+          child: GestureDetector(onTap: handleTap, child: item.child),
+        );
+      } else if (cardBuilder != null) {
+        card = SizedBox(
+          width: cardWidth,
+          height: cardHeight,
+          child: GestureDetector(
+            onTap: handleTap,
+            child: cardBuilder!(context, item, isCenter),
+          ),
+        );
+      } else {
+        card = _MobiusCard(
+          item: item,
+          width: cardWidth,
+          height: cardHeight,
+          isFocused: isCenter,
+          onTap: handleTap,
+        );
+      }
 
       entries.add(
         _MobiusEntry(
@@ -515,22 +575,7 @@ class _MobiusStack extends StatelessWidget {
               angle: rotation,
               child: Transform.scale(
                 scale: scale,
-                child: Opacity(
-                  opacity: opacity,
-                  child: _MobiusCard(
-                    item: items[itemIndex],
-                    width: cardWidth,
-                    height: cardHeight,
-                    isFocused: distance < 0.5,
-                    onTap: () {
-                      if (distance < 0.5 && onCenterCardTap != null) {
-                        onCenterCardTap!(items[itemIndex]);
-                      } else {
-                        onJumpTo(i);
-                      }
-                    },
-                  ),
-                ),
+                child: Opacity(opacity: opacity, child: card),
               ),
             ),
           ),

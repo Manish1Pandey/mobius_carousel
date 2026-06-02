@@ -88,6 +88,7 @@ Every visual is configurable. Defaults reproduce the look in the demo.
 | `showConfetti` | `true` | Whether to play the built-in confetti burst on claim. |
 | `showClaimedDialog` | `true` | Whether to show the built-in "Offer Claimed!" dialog on claim. |
 | `rippleStyle` | `MobiusRippleStyle.wavy` | `wavy`, `circular`, `semiCircle`, or `none`. |
+| `cardBuilder` | `null` | Optional builder for fully custom card visuals. See [Custom card](#custom-card) below. |
 | `onCenterCardTap` | `null` | Called when the focused card is tapped. |
 | `onOfferClaimed` | `null` | Called once when the pull crosses `claimThreshold`. |
 | `onClaimConfirmed` | `null` | Called after the user taps "Awesome!" in the dialog. |
@@ -104,19 +105,49 @@ class MobiusItem {
   final String? billAmount;
   final IconData? logo;
   final Color? color;
-
-  const MobiusItem({
-    this.code,
-    this.provider,
-    this.accountNumber,
-    this.billAmount,
-    this.logo,
-    this.color,
-  });
+  final Object? data;     // any payload — cast it back in your builder
+  final Widget? child;    // per-item custom widget; overrides cardBuilder
 }
 ```
 
-Missing fields render as empty / use sensible defaults.
+Missing display fields render as empty / use sensible defaults.
+
+### Attaching arbitrary data with `data`
+
+When you need fields beyond the predefined six, store any object on `data` and cast it back inside `cardBuilder`:
+
+```dart
+MobiusItem(
+  provider: 'Aquaflow',
+  data: MyOffer(rewardId: 42, tier: 'gold', expiresAt: DateTime(2025, 12, 31)),
+)
+
+// in MobiusCarousel:
+cardBuilder: (context, item, isFocused) {
+  final offer = item.data! as MyOffer;
+  return MyCard(reward: offer.rewardId, tier: offer.tier);
+}
+```
+
+### Per-item custom widget with `child`
+
+If a specific item needs a completely different visual (e.g. one promo card, the rest are regular), set `child` on just that item:
+
+```dart
+items: [
+  MobiusItem(provider: 'X', billAmount: '\$1'),      // built-in card
+  MobiusItem(
+    provider: 'Featured',
+    child: SpecialFeatureCard(),                     // custom widget
+  ),
+  MobiusItem(provider: 'Y', billAmount: '\$2'),      // built-in card
+]
+```
+
+**Priority** for each card's content:
+1. `item.child` — per-item override
+2. carousel-level `cardBuilder` — wide override
+3. Built-in scallop ticket card — default
 
 ## Ripple styles
 
@@ -131,6 +162,35 @@ MobiusCarousel(
 ```
 
 The ripple's intensity, count, and color tracks the user's vertical drag — pulling deeper reveals more rings, with opacity tied to the focused card's color.
+
+## Custom card
+
+The built-in scallop-edged ticket card reads from the `MobiusItem` fields. If you want full visual control — your own card shape, branding, layout — pass a `cardBuilder`. It receives the item and a `isFocused` flag and returns any widget. The carousel still handles sizing, the tap callback, drag, claim, confetti, and dialog around your card.
+
+```dart
+MobiusCarousel(
+  items: items,
+  cardBuilder: (context, item, isFocused) => Container(
+    decoration: BoxDecoration(
+      color: item.color,
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: isFocused
+          ? [BoxShadow(blurRadius: 24, color: Colors.black26)]
+          : null,
+    ),
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(item.provider ?? '', style: TextStyle(color: Colors.white)),
+        Text(item.billAmount ?? '', style: TextStyle(color: Colors.white)),
+      ],
+    ),
+  ),
+)
+```
+
+Your widget will be sized to `cardWidth × cardHeight`. The provided tap handler centers the card or fires `onCenterCardTap` exactly as the default card does. You can keep using the data fields on `MobiusItem`, ignore them entirely, or pass extra info via your own state — whatever fits your use case.
 
 ## Custom claim flow
 
