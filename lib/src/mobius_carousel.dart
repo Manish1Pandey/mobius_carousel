@@ -426,14 +426,13 @@ class _MobiusCarouselState extends State<MobiusCarousel>
   }
 
   Widget _buildRipple() {
-    if (widget.rippleStyle == MobiusRippleStyle.none ||
-        widget.items.isEmpty) {
+    if (widget.rippleStyle == MobiusRippleStyle.none || widget.items.isEmpty) {
       return const SizedBox.shrink();
     }
     final drag = _verticalDrag.value;
     if (drag <= 0) return const SizedBox.shrink();
-    final color = widget.items[_wrappedCenterIndex()].color ??
-        const Color(0xFFE91E63);
+    final color =
+        widget.items[_wrappedCenterIndex()].color ?? const Color(0xFFE91E63);
     final progress = drag / widget.claimThreshold;
     return CustomPaint(
       painter: switch (widget.rippleStyle) {
@@ -500,12 +499,10 @@ class _MobiusStack extends StatelessWidget {
       final dx = offset * itemSpacing + sideOffset.dx * distance;
       final dy = sideOffset.dy * distance + (isCenter ? verticalDrag : 0);
       final scale = (1.0 - distance * 0.04).clamp(0.94, 1.0);
-      final rotation = offset < 0
-          ? -offset * leftTiltRadians
-          : -offset * rightTiltRadians;
-      final opacity = distance <= 1.0
-          ? 1.0
-          : (1.0 - (distance - 1.0) * 3).clamp(0.0, 1.0);
+      final rotation =
+          offset < 0 ? -offset * leftTiltRadians : -offset * rightTiltRadians;
+      final opacity =
+          distance <= 1.0 ? 1.0 : (1.0 - (distance - 1.0) * 3).clamp(0.0, 1.0);
 
       final itemIndex = ((i % count) + count) % count;
 
