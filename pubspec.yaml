@@ -1,0 +1,28 @@
+name: mobius_carousel
+description: A custom infinite carousel slider with tilted neighbors, rubber-band pull-to-claim, confetti burst, claim dialog, and configurable ripple effects.
+version: 0.1.0
+homepage: https://github.com/Manish1Pandey/mobius_carousel
+repository: https://github.com/Manish1Pandey/mobius_carousel
+issue_tracker: https://github.com/Manish1Pandey/mobius_carousel/issues
+
+topics:
+  - carousel
+  - slider
+  - widget
+  - ui
+  - animation
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
