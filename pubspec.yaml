@@ -12,6 +12,10 @@ topics:
   - ui
   - animation
 
+screenshots:
+  - description: "Animated: swiping the tilted-card carousel, then pulling the centre card down to claim an offer."
+    path: doc/demo.gif
+
 environment:
   sdk: ^3.6.0
   flutter: ">=3.27.0"

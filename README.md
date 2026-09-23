@@ -4,6 +4,10 @@ A custom infinite carousel slider for Flutter with tilted neighbor cards, rubber
 
 Built from scratch — **zero third-party dependencies**, no state-management library required.
 
+![Swiping the carousel through tilted neighbour cards, then pulling the centre card down to claim an offer](doc/demo.gif)
+
+*The app in `example/`: swipe through the infinite-wrap carousel with its tilted neighbours, then pull the centre card down past the threshold for the ripple, confetti burst and claim dialog.*
+
 ## Features
 
 - 🎠 **Infinite-wrap horizontal swipe** through any list of items
