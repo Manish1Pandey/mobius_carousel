@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Documentation only: added a demo GIF showing swiping cards and claiming an offer. No code changes.
+
 ## 0.2.0
 
 * `MobiusCarousel.cardBuilder` — optional builder for fully custom card
