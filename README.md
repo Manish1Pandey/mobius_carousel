@@ -89,6 +89,7 @@ Every visual is configurable. Defaults reproduce the look in the demo.
 | `backgroundColor` | `null` | Scaffold background color. |
 | `autoPlayInterval` | `Duration(seconds: 4)` | Time between auto-advances. Pass `null` to disable. |
 | `claimThreshold` | `120` | Pull distance in pixels required to claim the offer. |
+| `dragToClaimEnabled` | `true` | Set `false` to switch off pull-down-to-claim entirely: no card follow, no ripple, no claim. Horizontal swiping, taps and auto-play keep working. |
 | `showConfetti` | `true` | Whether to play the built-in confetti burst on claim. |
 | `showClaimedDialog` | `true` | Whether to show the built-in "Offer Claimed!" dialog on claim. |
 | `rippleStyle` | `MobiusRippleStyle.wavy` | `wavy`, `circular`, `semiCircle`, or `none`. |

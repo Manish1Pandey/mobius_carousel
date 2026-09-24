@@ -66,12 +66,30 @@ class MobiusCarousel extends StatefulWidget {
   /// callback.
   final void Function(MobiusItem item)? onCenterCardTap;
 
+  /// Called whenever a different item settles into the center slot,
+  /// whether the user swiped there, tapped a neighbour, or auto-play
+  /// advanced. Fires once per change with the item's index in [items]
+  /// and the item itself, and once for the initial center after the
+  /// first frame — so a caption can simply mirror it without needing a
+  /// separate "what is centered right now" lookup.
+  final void Function(int index, MobiusItem item)? onCenterChanged;
+
   /// Called when the user pulls the center card past [claimThreshold]
   /// pixels downward. Fires once per pull.
   final void Function(MobiusItem item)? onOfferClaimed;
 
   /// Pull distance in pixels required to claim the offer.
   final double claimThreshold;
+
+  /// Whether the center card can be pulled down to claim its offer.
+  ///
+  /// When `false` the vertical drag gesture is not recognised at all: the
+  /// card does not follow the finger, the ripple never appears and
+  /// [onOfferClaimed] never fires. Horizontal swiping, tapping and
+  /// auto-play are unaffected, so the carousel still browses normally.
+  /// Use it for a read-only or showcase carousel, or to switch claiming
+  /// off while a claim is being processed.
+  final bool dragToClaimEnabled;
 
   /// Whether to play the built-in confetti burst on claim.
   final bool showConfetti;
@@ -128,8 +146,10 @@ class MobiusCarousel extends StatefulWidget {
     this.initialIndex = 1,
     this.backgroundColor,
     this.onCenterCardTap,
+    this.onCenterChanged,
     this.onOfferClaimed,
     this.claimThreshold = 120,
+    this.dragToClaimEnabled = true,
     this.showConfetti = true,
     this.showClaimedDialog = true,
     this.onClaimConfirmed,
@@ -164,10 +184,19 @@ class _MobiusCarouselState extends State<MobiusCarousel>
 
   static const double _maxVerticalDrag = 180;
 
+  /// Center index last reported through [MobiusCarousel.onCenterChanged].
+  int? _reportedCenterIndex;
+
   @override
   void initState() {
     super.initState();
     _position.value = widget.initialIndex.toDouble();
+    _position.addListener(_notifyCenterChanged);
+    // Report the starting center once the first frame is on screen, so a
+    // listener may safely call setState.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _notifyCenterChanged();
+    });
 
     _snapController = AnimationController(
       vsync: this,
@@ -201,6 +230,7 @@ class _MobiusCarouselState extends State<MobiusCarousel>
   @override
   void dispose() {
     _position.dispose();
+    _position.removeListener(_notifyCenterChanged);
     _verticalDrag.dispose();
     _snapController.dispose();
     _bounceController.dispose();
@@ -318,6 +348,19 @@ class _MobiusCarouselState extends State<MobiusCarousel>
     _animateTo(index.toDouble());
   }
 
+  /// Emits [MobiusCarousel.onCenterChanged] when the centered item
+  /// actually changes. [_position] ticks every animation frame, so the
+  /// guard keeps a caption from rebuilding 60 times a second.
+  void _notifyCenterChanged() {
+    final callback = widget.onCenterChanged;
+    if (callback == null || widget.items.isEmpty) return;
+
+    final index = _wrappedCenterIndex();
+    if (index == _reportedCenterIndex) return;
+    _reportedCenterIndex = index;
+    callback(index, widget.items[index]);
+  }
+
   int _wrappedCenterIndex() {
     final n = widget.items.length;
     if (n == 0) return 0;
@@ -387,10 +430,15 @@ class _MobiusCarouselState extends State<MobiusCarousel>
                           d.velocity.pixelsPerSecond.dx,
                           itemSpacing,
                         ),
-                        onVerticalDragStart: (_) => _onVerticalDragStart(),
-                        onVerticalDragUpdate: (d) =>
-                            _onVerticalDragUpdate(d.delta.dy),
-                        onVerticalDragEnd: (_) => _onVerticalDragEnd(),
+                        onVerticalDragStart: widget.dragToClaimEnabled
+                            ? (_) => _onVerticalDragStart()
+                            : null,
+                        onVerticalDragUpdate: widget.dragToClaimEnabled
+                            ? (d) => _onVerticalDragUpdate(d.delta.dy)
+                            : null,
+                        onVerticalDragEnd: widget.dragToClaimEnabled
+                            ? (_) => _onVerticalDragEnd()
+                            : null,
                         child: Center(
                           child: AnimatedBuilder(
                             animation:

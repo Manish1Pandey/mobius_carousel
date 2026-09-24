@@ -1,3 +1,13 @@
+## Unreleased
+
+* `dragToClaimEnabled` (default `true`) — set it to `false` to switch off
+  pull-down-to-claim entirely. The vertical gesture is not recognised, so
+  the card does not follow the finger, the ripple never draws and
+  `onOfferClaimed` never fires; horizontal swiping, taps and auto-play are
+  unaffected.
+* Example: cards now show public-domain bird photographs, with each card's
+  accent colour extracted from its own photo at run time.
+
 ## 0.2.1
 
 * Documentation only: added a demo GIF showing swiping cards and claiming an offer. No code changes.

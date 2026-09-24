@@ -143,6 +143,18 @@ class _HomePageState extends State<HomePage> {
   /// accent is used, so the first frame never waits on image work.
   final Map<String, Color> _accents = <String, Color>{};
 
+  /// Flip to `true` to bring back pull-down-to-claim along with the
+  /// offer copy hidden in [_DemoHeader] and [_DragHint].
+  static const bool _dragToClaimEnabled = false;
+
+  /// Which bird starts in the center. Passed to the carousel and used for
+  /// the header's first frame, so the two cannot disagree.
+  static const int _initialIndex = 1;
+
+  /// The bird currently in the center slot, mirrored from the carousel so
+  /// the header can name it.
+  _Bird _centered = _birds[_initialIndex];
+
   @override
   void initState() {
     super.initState();
@@ -177,9 +189,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MobiusCarousel(
       items: _items,
-      header: const _DemoHeader(),
-      footer: const _DragHint(),
+      initialIndex: _initialIndex,
+      header: _dragToClaimEnabled
+          ? const _DemoHeader()
+          : _BirdHeader(bird: _centered, color: _accents[_centered.asset]),
+      // The pull-down affordance would be pointing at nothing with
+      // claiming switched off.
+      footer: _dragToClaimEnabled ? const _DragHint() : null,
       rippleStyle: MobiusRippleStyle.semiCircle,
+      // The bird gallery browses sideways only; pulling a card down to
+      // claim is switched off.
+      dragToClaimEnabled: _dragToClaimEnabled,
+      onCenterChanged: (index, _) => setState(() => _centered = _birds[index]),
       cardBuilder: (context, item, isFocused) =>
           _BirdCard(item: item, isFocused: isFocused),
       onCenterCardTap: (item) {
@@ -335,6 +356,84 @@ class _OfferDetails extends StatelessWidget {
               fontSize: 30,
               fontWeight: FontWeight.w800,
               color: Color(0xFF1B1B1B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Header that names whichever bird is currently centered.
+///
+/// The name and its colour both come from the centered card, so swiping
+/// re-reads like turning a page in a field guide.
+class _BirdHeader extends StatelessWidget {
+  const _BirdHeader({required this.bird, required this.color});
+
+  final _Bird bird;
+
+  /// Accent extracted from this bird's photograph; null until it decodes.
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = color ?? const Color(0xFF6B6B6B);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
+      child: Column(
+        children: [
+          const Text(
+            'Six birds, six colours',
+            style: TextStyle(
+              fontSize: 13,
+              letterSpacing: 1.6,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF9A9A9A),
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Swapping the name crossfades instead of snapping, which keeps
+          // the header calm while the cards are still moving.
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 260),
+            child: Column(
+              key: ValueKey<String>(bird.asset),
+              children: [
+                Text(
+                  bird.species,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    color: accent,
+                    height: 1.15,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  bird.scientificName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    color: Color(0xFF8C8C8C),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'Every colour on this screen is read from the photograph '
+            'itself — swipe to change it.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: const Color(0xFF9A9A9A),
+              fontSize: 12.5,
+              height: 1.45,
+              // Keeps the two-line block from jumping as names change.
+              letterSpacing: 0.1,
             ),
           ),
         ],

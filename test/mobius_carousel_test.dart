@@ -59,4 +59,55 @@ void main() {
     await tester.pump();
     expect(find.text('Solo'), findsOneWidget);
   });
+
+  testWidgets('dragToClaimEnabled: false ignores a downward drag',
+      (tester) async {
+    var claimed = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MobiusCarousel(
+          items: const [
+            MobiusItem(provider: 'A', billAmount: '1'),
+            MobiusItem(provider: 'B', billAmount: '2'),
+          ],
+          dragToClaimEnabled: false,
+          showConfetti: false,
+          showClaimedDialog: false,
+          autoPlayInterval: null,
+          onOfferClaimed: (_) => claimed++,
+        ),
+      ),
+    );
+
+    // Well past the 120px claim threshold, even after drag resistance.
+    await tester.drag(find.byType(MobiusCarousel), const Offset(0, 600));
+    await tester.pumpAndSettle();
+
+    expect(claimed, 0);
+  });
+
+  testWidgets('dragToClaimEnabled: true still claims', (tester) async {
+    var claimed = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MobiusCarousel(
+          items: const [
+            MobiusItem(provider: 'A', billAmount: '1'),
+            MobiusItem(provider: 'B', billAmount: '2'),
+          ],
+          showConfetti: false,
+          showClaimedDialog: false,
+          autoPlayInterval: null,
+          onOfferClaimed: (_) => claimed++,
+        ),
+      ),
+    );
+
+    await tester.drag(find.byType(MobiusCarousel), const Offset(0, 600));
+    await tester.pumpAndSettle();
+
+    expect(claimed, 1);
+  });
 }
