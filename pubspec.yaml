@@ -1,6 +1,6 @@
 name: mobius_carousel
 description: A custom infinite carousel slider with tilted neighbors, rubber-band pull-to-claim, confetti burst, claim dialog, and configurable ripple effects.
-version: 0.3.0
+version: 0.3.1
 homepage: https://github.com/Manish1Pandey/mobius_carousel
 repository: https://github.com/Manish1Pandey/mobius_carousel
 issue_tracker: https://github.com/Manish1Pandey/mobius_carousel/issues
@@ -13,7 +13,7 @@ topics:
   - animation
 
 screenshots:
-  - description: "Animated: swiping the tilted-card carousel, then pulling the centre card down to claim an offer."
+  - description: "Animated: swiping between bird photos recolours the header and the pull-down ripple, using each photo's own colour."
     path: doc/demo.gif
 
 environment:

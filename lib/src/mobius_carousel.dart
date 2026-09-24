@@ -91,6 +91,18 @@ class MobiusCarousel extends StatefulWidget {
   /// off while a claim is being processed.
   final bool dragToClaimEnabled;
 
+  /// Whether crossing [claimThreshold] actually claims the offer.
+  ///
+  /// With `false` the pull still behaves normally — the card follows the
+  /// finger, the ripple draws and the card springs back — but nothing is
+  /// claimed: no confetti, no dialog, and [onOfferClaimed] never fires.
+  /// Use it to keep the gesture as a piece of showmanship, or to hold
+  /// claiming back until something else is ready.
+  ///
+  /// [dragToClaimEnabled] is the blunter switch: it stops the gesture
+  /// being recognised at all.
+  final bool claimEnabled;
+
   /// Whether to play the built-in confetti burst on claim.
   final bool showConfetti;
 
@@ -150,6 +162,7 @@ class MobiusCarousel extends StatefulWidget {
     this.onOfferClaimed,
     this.claimThreshold = 120,
     this.dragToClaimEnabled = true,
+    this.claimEnabled = true,
     this.showConfetti = true,
     this.showClaimedDialog = true,
     this.onClaimConfirmed,
@@ -325,6 +338,7 @@ class _MobiusCarouselState extends State<MobiusCarousel>
     }
 
     if (!_claimedThisDrag &&
+        widget.claimEnabled &&
         widget.items.isNotEmpty &&
         _verticalDrag.value >= widget.claimThreshold) {
       _claimedThisDrag = true;

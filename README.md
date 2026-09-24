@@ -4,9 +4,9 @@ A custom infinite carousel slider for Flutter with tilted neighbor cards, rubber
 
 Built from scratch — **zero third-party dependencies**, no state-management library required.
 
-![Swiping the carousel through tilted neighbour cards, then pulling the centre card down to claim an offer](doc/demo.gif)
+![Swiping between bird photographs: the header name and the pull-down ripple both take the colour of the centred photo](doc/demo.gif)
 
-*The app in `example/`: swipe through the infinite-wrap carousel with its tilted neighbours, then pull the centre card down past the threshold for the ripple, confetti burst and claim dialog.*
+*The app in `example/`: six bird photographs on the cards. Each one's accent colour is read from the photograph at runtime, so swiping between the macaw, the peafowl and the lovebird recolours the header name — and the semi-circle ripple that blooms when the centre card is pulled down.*
 
 ## Features
 
@@ -90,6 +90,7 @@ Every visual is configurable. Defaults reproduce the look in the demo.
 | `autoPlayInterval` | `Duration(seconds: 4)` | Time between auto-advances. Pass `null` to disable. |
 | `claimThreshold` | `120` | Pull distance in pixels required to claim the offer. |
 | `dragToClaimEnabled` | `true` | Set `false` to switch off pull-down-to-claim entirely: no card follow, no ripple, no claim. Horizontal swiping, taps and auto-play keep working. |
+| `claimEnabled` | `true` | Set `false` to keep the pull and the ripple but never claim: no confetti, no dialog, `onOfferClaimed` never fires. |
 | `showConfetti` | `true` | Whether to play the built-in confetti burst on claim. |
 | `showClaimedDialog` | `true` | Whether to show the built-in "Offer Claimed!" dialog on claim. |
 | `rippleStyle` | `MobiusRippleStyle.wavy` | `wavy`, `circular`, `semiCircle`, or `none`. |

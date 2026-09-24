@@ -143,9 +143,9 @@ class _HomePageState extends State<HomePage> {
   /// accent is used, so the first frame never waits on image work.
   final Map<String, Color> _accents = <String, Color>{};
 
-  /// Flip to `true` to bring back pull-down-to-claim along with the
-  /// offer copy hidden in [_DemoHeader] and [_DragHint].
-  static const bool _dragToClaimEnabled = false;
+  /// Flip to `true` to bring the offer experience back: the cashback
+  /// header and the drag hint become visible again and the pull claims.
+  static const bool _offersEnabled = false;
 
   /// Which bird starts in the center. Passed to the carousel and used for
   /// the header's first frame, so the two cannot disagree.
@@ -190,16 +190,26 @@ class _HomePageState extends State<HomePage> {
     return MobiusCarousel(
       items: _items,
       initialIndex: _initialIndex,
-      header: _dragToClaimEnabled
-          ? const _DemoHeader()
-          : _BirdHeader(bird: _centered, color: _accents[_centered.asset]),
-      // The pull-down affordance would be pointing at nothing with
-      // claiming switched off.
-      footer: _dragToClaimEnabled ? const _DragHint() : null,
+      header: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Built and kept alive — its countdown keeps ticking — but not
+          // painted and not taking up space while offers are off.
+          const Visibility(
+            visible: _offersEnabled,
+            maintainState: true,
+            maintainAnimation: true,
+            child: _DemoHeader(),
+          ),
+          _BirdHeader(bird: _centered, color: _accents[_centered.asset]),
+        ],
+      ),
+      footer: const _DragHint(),
       rippleStyle: MobiusRippleStyle.semiCircle,
       // The bird gallery browses sideways only; pulling a card down to
       // claim is switched off.
-      dragToClaimEnabled: _dragToClaimEnabled,
+      // The pull and its ripple stay; only the claim is held back.
+      claimEnabled: _offersEnabled,
       onCenterChanged: (index, _) => setState(() => _centered = _birds[index]),
       cardBuilder: (context, item, isFocused) =>
           _BirdCard(item: item, isFocused: isFocused),
@@ -557,12 +567,17 @@ class _DragHint extends StatelessWidget {
           color: const Color(0xFFC2185B).withValues(alpha: 0.6),
         ),
         const SizedBox(height: 6),
-        const Text(
-          'Drag down to Claim the Offer',
-          style: TextStyle(
-            color: Color(0xFF6B6B6B),
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
+        const Visibility(
+          visible: _HomePageState._offersEnabled,
+          maintainState: true,
+          maintainAnimation: true,
+          child: Text(
+            'Drag down to Claim the Offer',
+            style: TextStyle(
+              color: Color(0xFF6B6B6B),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],

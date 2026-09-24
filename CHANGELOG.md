@@ -1,3 +1,14 @@
+## 0.3.1
+
+* `claimEnabled` (default `true`) — set it to `false` to keep the pull-down
+  gesture and its ripple while never claiming: no confetti, no dialog, and
+  `onOfferClaimed` never fires.
+* Example: reads as a bird gallery. The header names the centred bird in the
+  colour taken from its own photograph, and the offer copy is kept in the
+  tree behind `Visibility`.
+* Re-recorded `doc/demo.gif` against the bird example, and excluded the
+  repository's still screenshots from the published archive (9 MB to 3 MB).
+
 ## 0.3.0
 
 * `dragToClaimEnabled` (default `true`) — set it to `false` to switch off

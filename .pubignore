@@ -1,0 +1,15 @@
+# pub uses this file INSTEAD of .gitignore when packaging, so the build
+# output has to be listed here too, not only in .gitignore.
+.dart_tool/
+build/
+example/build/
+example/.dart_tool/
+example/ios/Pods/
+example/macos/Pods/
+.idea/
+*.iml
+.DS_Store
+
+# Stills used in the repo and in issue reports; the published package only
+# needs doc/demo.gif, which the README and pubspec reference.
+doc/birds/

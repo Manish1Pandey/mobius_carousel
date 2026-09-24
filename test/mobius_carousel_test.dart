@@ -110,4 +110,41 @@ void main() {
 
     expect(claimed, 1);
   });
+
+  testWidgets('claimEnabled: false drags and ripples but never claims',
+      (tester) async {
+    var claimed = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MobiusCarousel(
+          items: const [
+            MobiusItem(provider: 'A', billAmount: '1'),
+            MobiusItem(provider: 'B', billAmount: '2'),
+          ],
+          claimEnabled: false,
+          showConfetti: false,
+          showClaimedDialog: false,
+          autoPlayInterval: null,
+          onOfferClaimed: (_) => claimed++,
+        ),
+      ),
+    );
+
+    // Hold the card down past the threshold: the gesture is still live, so
+    // the carousel moves the card — but nothing may be claimed.
+    final gesture = await tester
+        .startGesture(tester.getCenter(find.byType(MobiusCarousel)));
+    for (var i = 0; i < 20; i++) {
+      await gesture.moveBy(const Offset(0, 30));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(claimed, 0, reason: 'claim must not fire mid-drag');
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(claimed, 0);
+    expect(find.text('Offer Claimed!'), findsNothing);
+  });
 }
