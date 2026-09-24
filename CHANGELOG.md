@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 * `dragToClaimEnabled` (default `true`) — set it to `false` to switch off
   pull-down-to-claim entirely. The vertical gesture is not recognised, so
