@@ -26,7 +26,7 @@ Built from scratch — **zero third-party dependencies**, no state-management li
 
 ```yaml
 dependencies:
-  mobius_carousel: ^0.1.0
+  mobius_carousel: ^0.3.1
 ```
 
 ## Usage
