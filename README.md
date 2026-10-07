@@ -224,6 +224,12 @@ MobiusCarousel(
 
 See `example/lib/main.dart` for a complete demo with a header, footer, and routing on claim.
 
+## Links
+
+- **Documentation and live demo:** [flutterdev.in/packages/mobius_carousel](https://flutterdev.in/packages/mobius_carousel/)
+- **More Flutter packages:** [flutterdev.in](https://flutterdev.in)
+- **Learn data structures & algorithms in Dart:** [Algoistan](https://algoistan.flutterdev.in)
+
 ## License
 
 MIT
