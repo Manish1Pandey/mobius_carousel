@@ -1,3 +1,7 @@
+## 0.3.2
+
+* Homepage and README now link to the package's documentation page on flutterdev.in. No code changes.
+
 ## 0.3.1
 
 * `claimEnabled` (default `true`) — set it to `false` to keep the pull-down
